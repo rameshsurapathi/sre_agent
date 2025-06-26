@@ -13,9 +13,8 @@ LABEL org.opencontainers.image.description="AI-powered SRE assistant using FastA
 WORKDIR /app
 
 # Install System Dependencies
-RUN apt-get get update && apt-get install -y \
+RUN apt-get update && apt-get install -y \
     build-essential \
-    libpq-dev \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
