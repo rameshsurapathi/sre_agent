@@ -1,0 +1,15 @@
+# AI Agent required libraries
+langgraph
+langsmith
+langchain
+python-dotenv
+
+# FastAPI for building APIs
+fastapi
+uvicorn[standard]
+jinja2
+redis
+
+# Additional dependencies
+pydantic
+langchain-google-genai
