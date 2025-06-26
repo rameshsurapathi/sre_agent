@@ -9,7 +9,7 @@ from collections import defaultdict
 import os
 from src.ai_agent import AI_Agent
 
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
 # Allow CORS for local frontend
 app.add_middleware(
