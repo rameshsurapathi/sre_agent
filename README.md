@@ -19,7 +19,7 @@ The SRE Agent is designed to be your go-to expert for Site Reliability Engineeri
 - **LangChain**: Framework for developing applications with language models
 - **LangGraph**: Library for building stateful, multi-actor applications with LLMs
 - **Google Generative AI**: Powered by Google's advanced language models
-- **Redis**: In-memory caching for response optimization
+- **Google Firestore**: NoSQL document database for response caching and data persistence
 - **Uvicorn**: ASGI web server for serving the FastAPI application
 
 ### Frontend
@@ -56,7 +56,7 @@ The SRE Agent is designed to be your go-to expert for Site Reliability Engineeri
 
 ### Backend Features
 - Rate limiting to prevent abuse
-- Redis caching for improved response times
+- Firestore caching for improved response times and data persistence
 - Comprehensive error handling
 - CORS support for cross-origin requests
 
@@ -70,8 +70,8 @@ The SRE Agent is designed to be your go-to expert for Site Reliability Engineeri
 └─────────────────┘    └─────────────────┘    └─────────────────┘
                               │
                        ┌─────────────────┐
-                       │   Redis Cache   │
-                       │                 │
+                       │ Google Firestore│
+                       │    (Caching)    │
                        └─────────────────┘
 ```
 
@@ -97,8 +97,9 @@ sre_agent/
 
 ### Prerequisites
 - Python 3.13+
-- Redis server (for caching)
+- Google Cloud Project with Firestore enabled
 - Google API key for Generative AI
+- Google Cloud credentials for Firestore access
 
 ### Installation
 
@@ -125,14 +126,15 @@ sre_agent/
    ```env
    GOOGLE_API_KEY=your_google_api_key_here
    LLM_MODEL=google-genai
-   REDIS_HOST=localhost
-   REDIS_PORT=6379
+   GOOGLE_APPLICATION_CREDENTIALS=path/to/your/service-account-key.json
+   FIRESTORE_PROJECT_ID=your-gcp-project-id
    ```
 
-5. **Start Redis server**
-   ```bash
-   redis-server
-   ```
+5. **Set up Google Cloud Firestore**
+   - Create a Google Cloud Project
+   - Enable the Firestore API
+   - Create a service account and download the JSON key file
+   - Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable
 
 6. **Run the application**
    ```bash
@@ -147,8 +149,8 @@ sre_agent/
 ### Environment Variables
 - `GOOGLE_API_KEY`: Your Google Generative AI API key
 - `LLM_MODEL`: The language model to use (default: google-genai)
-- `REDIS_HOST`: Redis server hostname (default: localhost)
-- `REDIS_PORT`: Redis server port (default: 6379)
+- `GOOGLE_APPLICATION_CREDENTIALS`: Path to your Google Cloud service account JSON key file
+- `FIRESTORE_PROJECT_ID`: Your Google Cloud Project ID
 - `DEBUG`: Enable debug mode (default: true)
 
 ### Rate Limiting
