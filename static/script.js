@@ -216,72 +216,8 @@ class SREChatInterface {
         } catch (error) {
             console.error('Error sending message to API:', error);
             this.hideTypingIndicator();
-            this.addMessage('Sorry, I encountered an error while processing your request. Please try again.', 'bot');
+            this.addMessage('Sorry, I encountered an error while processing your request. Please try again later.', 'bot');
         }
-    }
-    
-    // Fallback method for offline mode or API errors
-    generateBotResponse(userMessage) {
-        const responses = this.getSREResponses(userMessage);
-        const response = responses[Math.floor(Math.random() * responses.length)];
-        this.addMessage(response, 'bot');
-    }
-    
-    getSREResponses(message) {
-        const lowerMessage = message.toLowerCase();
-        
-        // SLI/SLO related responses
-        if (lowerMessage.includes('sli') || lowerMessage.includes('slo') || lowerMessage.includes('service level')) {
-            return [
-                "For effective SLI/SLO design, start by identifying your critical user journeys. Common SLIs include request latency (99th percentile), availability (uptime percentage), and error rate. Set SLOs at 99.9% availability with a monthly error budget of 43 minutes downtime.",
-                "SLI/SLO implementation requires careful metric selection. Focus on user-facing metrics: latency (response time), availability (successful requests), and quality (error-free responses). Use tools like Prometheus with alerting rules when error budgets are consumed too quickly.",
-                "Best practice for SLOs: Start with 99.9% availability, measure over 28-day windows, and define clear escalation procedures when error budgets are exhausted. Remember: SLOs should be slightly lower than actual performance to maintain buffer."
-            ];
-        }
-        
-        // Monitoring related responses
-        if (lowerMessage.includes('monitor') || lowerMessage.includes('observability') || lowerMessage.includes('prometheus') || lowerMessage.includes('grafana')) {
-            return [
-                "For comprehensive monitoring, implement the three pillars of observability: metrics (Prometheus), logs (ELK stack), and traces (Jaeger). Set up dashboards in Grafana with RED metrics (Rate, Errors, Duration) and USE metrics (Utilization, Saturation, Errors).",
-                "Monitoring stack recommendation: Prometheus for metrics collection, Grafana for visualization, AlertManager for alerting, and Jaeger for distributed tracing. Implement custom business metrics alongside infrastructure metrics for complete visibility.",
-                "Effective monitoring requires proactive alerting. Set up alerts for: Error rate > 1%, Latency > 500ms (95th percentile), and Saturation > 80%. Use runbooks for each alert with clear troubleshooting steps and escalation procedures."
-            ];
-        }
-        
-        // Incident response related responses
-        if (lowerMessage.includes('incident') || lowerMessage.includes('response') || lowerMessage.includes('outage') || lowerMessage.includes('pager')) {
-            return [
-                "Incident response best practices: Implement a clear escalation matrix, use PagerDuty for alert routing, maintain updated runbooks, and conduct blameless post-mortems. Key roles: Incident Commander, Communications Lead, and Technical Lead.",
-                "For effective incident management: Use structured communication (status pages, Slack channels), implement severity levels (P0-P4), and maintain detailed timelines. Focus on MTTR reduction through automation and clear procedures.",
-                "Post-incident process is crucial: Conduct blameless post-mortems within 48 hours, identify root causes and contributing factors, create action items with owners and due dates, and share learnings across teams."
-            ];
-        }
-        
-        // Chaos engineering related responses
-        if (lowerMessage.includes('chaos') || lowerMessage.includes('resilience') || lowerMessage.includes('failure')) {
-            return [
-                "Chaos engineering starts small: Begin with controlled experiments in non-production environments. Use tools like Chaos Monkey for random instance termination, or Gremlin for comprehensive failure injection. Always have abort mechanisms.",
-                "Resilience testing should cover: Network partitions, service dependencies failures, resource exhaustion (CPU, memory), and data corruption scenarios. Implement circuit breakers and bulkhead patterns for fault isolation.",
-                "Build resilience with: Retry logic with exponential backoff, circuit breakers to prevent cascade failures, timeouts on all external calls, and graceful degradation when dependencies are unavailable."
-            ];
-        }
-        
-        // Capacity planning related responses
-        if (lowerMessage.includes('capacity') || lowerMessage.includes('scaling') || lowerMessage.includes('load') || lowerMessage.includes('performance')) {
-            return [
-                "Capacity planning requires historical data analysis and growth projections. Monitor CPU, memory, disk I/O, and network utilization. Plan for 2x expected peak load and implement auto-scaling policies with proper warm-up times.",
-                "Load testing strategy: Use tools like k6 or JMeter for performance testing. Test scenarios: Normal load, peak load (2x normal), and spike testing (sudden traffic increases). Monitor application and infrastructure metrics during tests.",
-                "Implement horizontal pod autoscaling (HPA) and vertical pod autoscaling (VPA) in Kubernetes. Set CPU/memory thresholds at 70% utilization for scale-out events, with proper resource requests and limits defined."
-            ];
-        }
-        
-        // Default responses
-        return [
-            "As an SRE expert, I can help you with monitoring, incident response, capacity planning, and system reliability. What specific challenge are you facing with your infrastructure or services?",
-            "I specialize in building resilient distributed systems. Whether you need help with SLI/SLO design, chaos engineering, or observability implementation, I'm here to guide you through best practices.",
-            "Site Reliability Engineering focuses on balancing feature development with system stability. What aspect of SRE would you like to explore - monitoring strategies, incident management, or reliability patterns?",
-            "Let me help you improve your system's reliability. I can assist with implementing monitoring solutions, designing incident response procedures, or planning capacity management strategies."
-        ];
     }
     
     autoResizeInput() {
