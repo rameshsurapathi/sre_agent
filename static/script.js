@@ -57,7 +57,9 @@ class SREChatInterface {
             const htmlContent = this.convertMarkdownToHTML(content);
             messageContent.innerHTML = htmlContent;
             
-            // Add Save to PDF button for bot messages
+            messageDiv.appendChild(messageContent);
+            
+            // Add Save to PDF button for bot messages below the content
             const pdfButton = document.createElement('button');
             pdfButton.className = 'pdf-button';
             pdfButton.innerHTML = '📄 Save to PDF';
@@ -65,9 +67,9 @@ class SREChatInterface {
             messageDiv.appendChild(pdfButton);
         } else {
             messageContent.textContent = content;
+            messageDiv.appendChild(messageContent);
         }
         
-        messageDiv.appendChild(messageContent);
         this.chatMessages.appendChild(messageDiv);
         
         // Smooth scroll to the new message
