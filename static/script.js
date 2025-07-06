@@ -56,6 +56,13 @@ class SREChatInterface {
             // Convert markdown to HTML if needed
             const htmlContent = this.convertMarkdownToHTML(content);
             messageContent.innerHTML = htmlContent;
+            
+            // Add Save to PDF button for bot messages
+            const pdfButton = document.createElement('button');
+            pdfButton.className = 'pdf-button';
+            pdfButton.innerHTML = '📄 Save to PDF';
+            pdfButton.onclick = () => this.saveToPDF(htmlContent);
+            messageDiv.appendChild(pdfButton);
         } else {
             messageContent.textContent = content;
         }
@@ -120,6 +127,237 @@ class SREChatInterface {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    saveToPDF(content) {
+        // Create a new window for printing
+        const printWindow = window.open('', '_blank');
+        
+        // Create the HTML content for the PDF
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>SRE Agent Response</title>
+                <style>
+                    body {
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        max-width: 800px;
+                        margin: 0 auto;
+                        padding: 20px;
+                    }
+                    
+                    h1, h2, h3 {
+                        color: #2c3e50;
+                        margin-top: 30px;
+                        margin-bottom: 15px;
+                    }
+                    
+                    h1 { font-size: 24px; }
+                    h2 { font-size: 20px; }
+                    h3 { font-size: 18px; }
+                    
+                    p {
+                        margin-bottom: 15px;
+                        text-align: justify;
+                    }
+                    
+                    code {
+                        background-color: #f4f4f4;
+                        padding: 2px 6px;
+                        border-radius: 3px;
+                        font-family: 'Courier New', monospace;
+                        font-size: 14px;
+                    }
+                    
+                    pre {
+                        background-color: #f8f9fa;
+                        border: 1px solid #e9ecef;
+                        border-radius: 6px;
+                        padding: 16px;
+                        margin: 20px 0;
+                        overflow-x: auto;
+                    }
+                    
+                    pre code {
+                        background: none;
+                        padding: 0;
+                        font-size: 13px;
+                        line-height: 1.4;
+                    }
+                    
+                    strong {
+                        font-weight: 600;
+                        color: #2c3e50;
+                    }
+                    
+                    em {
+                        font-style: italic;
+                        color: #555;
+                    }
+                    
+                    hr {
+                        border: none;
+                        border-top: 2px solid #eee;
+                        margin: 30px 0;
+                    }
+                    
+                    .header {
+                        text-align: center;
+                        border-bottom: 2px solid #3498db;
+                        padding-bottom: 20px;
+                        margin-bottom: 30px;
+                    }
+                    
+                    .header h1 {
+                        color: #3498db;
+                        margin: 0;
+                    }
+                    
+                    .timestamp {
+                        color: #666;
+                        font-size: 12px;
+                        text-align: right;
+                        margin-top: 30px;
+                        padding-top: 20px;
+                        border-top: 1px solid #eee;
+                    }
+                    
+                    @media print {
+                        body {
+                            font-size: 12px;
+                            line-height: 1.4;
+                        }
+                        
+                        h1 { font-size: 18px; }
+                        h2 { font-size: 16px; }
+                        h3 { font-size: 14px; }
+                        
+                        pre {
+                            page-break-inside: avoid;
+                        }
+                        
+                        .header {
+                            page-break-after: avoid;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>SRE Agent Response</h1>
+                </div>
+                
+                <div class="content">
+                    ${content}
+                </div>
+                
+                <div class="timestamp">
+                    Generated on: ${new Date().toLocaleString()}
+                </div>
+            </body>
+            </html>
+        `;
+        
+        // Write the HTML to the new window
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        
+        // Wait for the content to load, then print
+        printWindow.onload = function() {
+            printWindow.print();
+            // Close the window after printing (optional)
+            printWindow.onafterprint = function() {
+                printWindow.close();
+            };
+        };
+        
+        // Show success message
+        this.showToast('PDF generation initiated! Please check your downloads folder.');
+    }
+
+    showToast(message, type = 'success') {
+        // Remove existing toast if any
+        const existingToast = document.querySelector('.toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        
+        // Add toast styles if not already added
+        this.addToastStyles();
+        
+        // Add to body
+        document.body.appendChild(toast);
+        
+        // Show toast with animation
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+        
+        // Hide and remove toast after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+
+    addToastStyles() {
+        if (document.querySelector('.toast-styles')) return;
+        
+        const style = document.createElement('style');
+        style.className = 'toast-styles';
+        style.textContent = `
+            .toast {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: #4caf50;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 10000;
+                opacity: 0;
+                transform: translateY(-20px);
+                transition: all 0.3s ease;
+                max-width: 300px;
+                word-wrap: break-word;
+            }
+            
+            .toast.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            
+            .toast-success {
+                background-color: #4caf50;
+            }
+            
+            .toast-error {
+                background-color: #f44336;
+            }
+            
+            .toast-warning {
+                background-color: #ff9800;
+            }
+            
+            .toast-info {
+                background-color: #2196f3;
+            }
+        `;
+        document.head.appendChild(style);
     }
     
     showTypingIndicator() {
@@ -195,7 +433,8 @@ class SREChatInterface {
     
     async sendToAPI(message) {
         try {
-            const response = await fetch('api/chat', {
+            const apiUrl = 'https://sre-agent-948325778469.northamerica-northeast2.run.app/api/chat'; // Replace with your actual API URL
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
