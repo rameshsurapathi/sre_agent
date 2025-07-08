@@ -146,19 +146,4 @@ async def delete_chat_history(request: Request, delete_request: DeleteHistoryReq
         print(f"Error in delete_chat_history: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to delete chat history: {str(e)}")
 
-@app.post("/api/cleanup")
-async def cleanup_expired_data(request: Request):
-    """Manual cleanup endpoint for expired data"""
-    try:
-        api_key = os.getenv("GOOGLE_API_KEY")
-        if not api_key:
-            raise HTTPException(status_code=500, detail="GOOGLE_API_KEY not found in environment variables.")
-        
-        agent = AI_Agent(api_key)
-        agent.cleanup_expired_data()
-        
-        return JSONResponse({"message": "Cleanup completed successfully"})
-    
-    except Exception as e:
-        print(f"Error in cleanup: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to cleanup: {str(e)}")
+    # /api/cleanup endpoint and related code removed for now

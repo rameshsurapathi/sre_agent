@@ -190,27 +190,7 @@ Please provide a helpful response considering the conversation context above. If
             print(f"Error deleting chat history: {e}")
             raise
 
-    def cleanup_expired_data(self):
-        """Clean up expired cache and chat history (run this periodically)"""
-        try:
-            # Clean up expired cache
-            cache_ref = self.db.collection('sre-agent-cache')
-            expired_cache = cache_ref.where('expires', '<', datetime.now(timezone.utc)).get()
-            
-            for doc in expired_cache:
-                doc.reference.delete()
-                
-            # Clean up expired chat history
-            history_ref = self.db.collection('sre-agent-chat-history')
-            expired_history = history_ref.where('expires_at', '<', datetime.now(timezone.utc)).get()
-            
-            for doc in expired_history:
-                doc.reference.delete()
-                
-            print(f"Cleaned up {len(expired_cache)} expired cache entries and {len(expired_history)} expired chat histories")
-            
-        except Exception as e:
-            print(f"Error during cleanup: {e}")
+    # cleanup_expired_data removed for now
 
 def main():
 

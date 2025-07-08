@@ -350,7 +350,6 @@ body {
     transform: scale(0.95);
 }
 
-<<<<<<< HEAD
 /* Inline Chat Controls beside header */
 .chat-header-row {
     display: flex;
@@ -475,70 +474,6 @@ body {
     animation: fadeInUp 0.3s ease;
 }
 
-=======
-/* Chat Separator Styles */
-.chat-separator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 0;
-    position: relative;
-}
-
-.chat-separator::before,
-.chat-separator::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
-}
-
-.chat-separator span {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    margin: 0 15px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.chat-separator.current span {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* Enhanced Chat History Indicator */
-.chat-history-indicator {
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-size: 14px;
-    display: inline-block;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    font-weight: 500;
-    letter-spacing: 0.5px;
-}
-
-.chat-history-indicator::before {
-    content: '💾';
-    margin-right: 8px;
-}
-
-/* Message styling improvements */
-.message {
-    margin-bottom: 15px;
-    display: flex;
-    gap: 10px;
-    animation: fadeInUp 0.3s ease;
-}
-
->>>>>>> 6952763a6770e917a089ff0b620980b0f4f0c9f2
 @keyframes fadeInUp {
     from {
         opacity: 0;
