@@ -1,5 +1,41 @@
 // Chat functionality
 class SREChatInterface {
+    startNewChat() {
+        // Just clear the chat view without deleting from database
+        this.chatMessages.innerHTML = '';
+        this.showToast('Started new chat session!');
+    }
+    showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+    newChat() {
+        // Clear all chat messages
+        this.chatMessages.innerHTML = '';
+        // Optionally clear input
+        this.chatInput.value = '';
+        // Optionally reset chat history or state
+        // this.chatHistory = [];
+        // this.currentUserId = null; // Uncomment if you want to reset user session
+        this.showToast('Started a new chat!');
+    }
     async sendToAPI(message) {
         // Sends the user message to the backend and handles the response
         try {
