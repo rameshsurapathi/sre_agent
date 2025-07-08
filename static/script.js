@@ -147,12 +147,6 @@ class SREChatInterface {
         if (storedUserId) {
             this.currentUserId = storedUserId;
             this.loadRecentChatOnStartup();
-        } else {
-            // Friendly greeting with name prompt if new user
-            this.addMessage(
-                "I'm your Expert Site Reliability Engineer. I specialize in monitoring, observability, incident response, system reliability, and SRE best practices. I can help you with SLI/SLO design, chaos engineering, Prometheus/Grafana, alerting strategies, capacity planning, and building resilient distributed systems. What reliability challenge are you working on today? By the way, with whom do I have the pleasure to talk today? (Or, hey, can you tell me your name?)",
-                'bot'
-            );
         }
     }
     
