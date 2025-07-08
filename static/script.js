@@ -1,5 +1,29 @@
 // Chat functionality
 class SREChatInterface {
+    async deleteAllHistory() {
+        if (!this.currentUserId) {
+            this.showToast('No user session found.', 'error');
+            return;
+        }
+        try {
+            const apiUrl = 'https://sre-agent-948325778469.northamerica-northeast2.run.app/api/chat-history'; // Replace with your actual API URL
+            const response = await fetch(apiUrl, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: this.currentUserId })
+            });
+            if (response.ok) {
+                this.chatMessages.innerHTML = '';
+                this.showToast('Chat history deleted!');
+            } else {
+                this.showToast('Failed to delete chat history.', 'error');
+            }
+        } catch (error) {
+            this.showToast('Network error. Please try again.', 'error');
+        }
+    }
     startNewChat() {
         // Just clear the chat view without deleting from database
         this.chatMessages.innerHTML = '';
@@ -39,7 +63,8 @@ class SREChatInterface {
     async sendToAPI(message) {
         // Sends the user message to the backend and handles the response
         try {
-            const response = await fetch('/api/chat', {
+            const apiUrl = 'https://sre-agent-948325778469.northamerica-northeast2.run.app/api/chat'; // Replace with your actual API URL
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -350,7 +375,8 @@ class SREChatInterface {
         }
 
         try {
-            const response = await fetch('/api/chat-history', {
+            const apiUrl = 'https://sre-agent-948325778469.northamerica-northeast2.run.app/api/chat-history'; // Replace with your actual API URL
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
