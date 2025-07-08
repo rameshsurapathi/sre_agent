@@ -98,14 +98,17 @@ class SREChatInterface {
         }, 3000);
     }
     newChat() {
-        // Clear all chat messages
-        this.chatMessages.innerHTML = '';
-        // Optionally clear input
-        this.chatInput.value = '';
-        // Optionally reset chat history or state
-        // this.chatHistory = [];
-        // this.currentUserId = null; // Uncomment if you want to reset user session
-        this.showToast('Started a new chat!');
+        // Show confirmation modal before clearing chat
+        this.showConfirmationModal('This will clear the current conversation. Continue?', () => {
+            // Clear all chat messages
+            this.chatMessages.innerHTML = '';
+            // Optionally clear input
+            this.chatInput.value = '';
+            // Optionally reset chat history or state
+            // this.chatHistory = [];
+            // this.currentUserId = null; // Uncomment if you want to reset user session
+            this.showToast('Started a new chat!');
+        });
     }
     async sendToAPI(message) {
         // Sends the user message to the backend and handles the response

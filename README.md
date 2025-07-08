@@ -117,10 +117,29 @@ sre_agent/
    ```
 
 3. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
+
+   Create a `.env` file in the project root with your configuration. Example:
+   ```env
+   GOOGLE_API_KEY=your_google_api_key_here
+   LLM_MODEL=google-genai
+   GOOGLE_APPLICATION_CREDENTIALS=path/to/your/service-account-key.json
+   FIRESTORE_PROJECT_ID=your-gcp-project-id
    ```
+---
+
+## 🆕 New & Enhanced Features (2025-07-08)
+
+- **Save to PDF**: Instantly export any AI response to a beautifully formatted PDF with a single click. The button appears directly below each AI message.
+- **Chat History & Context Memory**: All chat history and context are saved per user (using browser fingerprint/localStorage) in Firestore, with 1-month cache and 1-week chat history retention.
+- **Chat Controls**: Modern, responsive controls for New Chat, View History, and Delete History, now located in the chat header for better UX.
+- **Confirmation Modals**: Friendly confirmation dialogs for deleting all chat history and starting a new chat ("This will clear the current conversation. Continue?").
+- **Chat History Modal**: View your last 7 days of chat history in a beautiful, scrollable modal with collapsible AI responses and timestamps.
+- **Session Persistence**: The last 5 chat interactions are automatically loaded for returning users.
+- **Enhanced Greeting**: The initial greeting now asks for your name ("By the way, with whom do I have the pleasure to talk today?"), making the chat more friendly and personal.
+- **UI/UX Polish**: Improved CSS for chat controls, PDF button, and modals. All controls are mobile-friendly and visually consistent.
+- **Robust Error Handling**: Improved error messages and handling for all chat and history actions.
+- **Sample Questions**: Clickable question cards for common SRE topics, with smooth scroll and instant population to the chat input.
+- **No .env.example**: The setup instructions now reflect that you must create your own `.env` file (no template is provided).
 
 4. **Configure your environment**
    ```env
