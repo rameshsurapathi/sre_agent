@@ -147,6 +147,12 @@ class SREChatInterface {
         if (storedUserId) {
             this.currentUserId = storedUserId;
             this.loadRecentChatOnStartup();
+        } else {
+            // Friendly greeting with name prompt if new user
+            this.addMessage(
+                "I'm your Expert Site Reliability Engineer. I specialize in monitoring, observability, incident response, system reliability, and SRE best practices. I can help you with SLI/SLO design, chaos engineering, Prometheus/Grafana, alerting strategies, capacity planning, and building resilient distributed systems. What reliability challenge are you working on today? By the way, with whom do I have the pleasure to talk today? (Or, hey, can you tell me your name?)",
+                'bot'
+            );
         }
     }
     
@@ -189,31 +195,35 @@ class SREChatInterface {
     addMessage(content, sender) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${sender}`;
-        
+
         const messageContent = document.createElement('div');
         messageContent.className = 'message-content';
-        
-        // Use innerHTML for bot messages to render HTML, textContent for user messages for security
+
         if (sender === 'bot') {
             // Convert markdown to HTML if needed
             const htmlContent = this.convertMarkdownToHTML(content);
             messageContent.innerHTML = htmlContent;
-            
-            messageDiv.appendChild(messageContent);
-            
+
+            // Create a container for the bot message and the button (vertical stack)
+            const botContainer = document.createElement('div');
+            botContainer.className = 'bot-message-container';
+            botContainer.appendChild(messageContent);
+
             // Add Save to PDF button for bot messages below the content
             const pdfButton = document.createElement('button');
             pdfButton.className = 'pdf-button';
             pdfButton.innerHTML = '📄 Save to PDF';
             pdfButton.onclick = () => this.saveToPDF(htmlContent);
-            messageDiv.appendChild(pdfButton);
+            botContainer.appendChild(pdfButton);
+
+            messageDiv.appendChild(botContainer);
         } else {
             messageContent.textContent = content;
             messageDiv.appendChild(messageContent);
         }
-        
+
         this.chatMessages.appendChild(messageDiv);
-        
+
         // Smooth scroll to the new message
         setTimeout(() => {
             messageDiv.scrollIntoView({ 
@@ -736,10 +746,37 @@ document.addEventListener('DOMContentLoaded', () => {
     window.sreChat = new SREChatInterface();
     new QuestionCardInteractions();
     new SmoothScrolling();
-    
+
     // Add some visual enhancements
     addVisualEnhancements();
-    
+
+    // Inject PDF button CSS fix for vertical stacking and style
+    const pdfBtnStyle = document.createElement('style');
+    pdfBtnStyle.textContent = `
+        .bot-message-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .pdf-button {
+            margin-top: 0.7em;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 0.45em 1.1em;
+            font-size: 1em;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(37,99,235,0.08);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .pdf-button:hover {
+            background: #1d4ed8;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.13);
+        }
+    `;
+    document.head.appendChild(pdfBtnStyle);
+
     // Add global functions for HTML onclick handlers
     window.newChat = () => window.sreChat.newChat();
     window.deleteAllHistory = () => window.sreChat.deleteAllHistory();
