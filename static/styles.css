@@ -204,6 +204,7 @@ body {
     margin-bottom: 15px;
     display: flex;
     gap: 10px;
+    animation: fadeInUp 0.3s ease;
 }
 
 .message.user {
@@ -349,101 +350,153 @@ body {
     transform: scale(0.95);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .container {
-        padding: 15px;
-    }
-    
-    .main-title {
-        font-size: 2.5rem;
-    }
-    
-    .questions-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .question-card {
-        padding: 20px;
-    }
-    
-    .chat-header {
-        padding: 20px;
-    }
-    
-    .chat-messages {
-        padding: 15px 20px;
-    }
-    
-    .chat-input-container {
-        padding: 15px 20px;
-    }
-}
-
-/* PDF Button Styles */
-.pdf-button {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+/* Inline Chat Controls beside header */
+.chat-header-row {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-top: 12px;
-    margin-left: auto;
-    width: fit-content;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
 }
 
-.pdf-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(135deg, #5a6fd8, #6b42a0);
+.chat-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
 }
 
-.pdf-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.message.bot {
+.chat-controls-inline {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    gap: 8px;
+    align-items: center;
 }
 
-@media (max-width: 480px) {
-    .main-title {
-        font-size: 2rem;
+.control-btn {
+    padding: 7px 16px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    outline: none;
+    margin: 0;
+}
+
+.control-btn:hover {
+    background: linear-gradient(135deg, #5a6fd8, #6b42a0);
+    transform: translateY(-1px);
+}
+
+.control-btn.danger {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.control-btn.danger:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+}
+
+.chat-history-indicator {
+    background: rgba(102, 126, 234, 0.12);
+    color: #333;
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: 8px;
+    border: 1px solid #e0e0e0;
+    display: inline-block;
+}
+
+/* Chat Separator Styles */
+.chat-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.chat-separator::before,
+.chat-separator::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.chat-separator span {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    margin: 0 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.chat-separator.current span {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Enhanced Chat History Indicator */
+.chat-history-indicator {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    display: inline-block;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.chat-history-indicator::before {
+    content: '💾';
+    margin-right: 8px;
+}
+
+/* Message styling improvements */
+.message {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+    animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    .subtitle {
-        font-size: 1rem;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    
-    .questions-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .question-card {
-        padding: 15px;
-    }
-    
-    .message-content {
-        max-width: 85%;
-    }
-    
-    .message.bot .message-content {
-        max-width: 95%;
-    }
-    
-    .message.user .message-content {
-        max-width: 85%;
-    }
+}
+
+/* Context indicator for messages */
+.message.bot .message-content::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 2px;
+}
+
+.message.bot .message-content {
+    position: relative;
 }

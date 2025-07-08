@@ -4,8 +4,11 @@ class SREChatInterface {
         this.chatInput = document.getElementById('chatInput');
         this.sendButton = document.getElementById('sendButton');
         this.chatMessages = document.getElementById('chatMessages');
+        this.currentUserId = null;
+        this.chatHistory = [];
         
         this.initializeEventListeners();
+        this.initializeUserSession();
     }
     
     initializeEventListeners() {
@@ -25,6 +28,180 @@ class SREChatInterface {
         this.chatInput.addEventListener('input', () => {
             this.autoResizeInput();
         });
+    }
+
+    initializeUserSession() {
+        // Enhanced user ID generation with multiple fallbacks
+        this.currentUserId = this.getOrCreateUserId();
+        // Load chat history after user ID is set
+        this.loadChatHistory();
+        // Do NOT show welcome message by default
+    }
+
+    getOrCreateUserId() {
+        // Try to get from localStorage first
+        let userId = localStorage.getItem('sre_agent_user_id');
+        
+        if (!userId) {
+            // Generate enhanced fingerprint
+            userId = this.generateEnhancedFingerprint();
+            localStorage.setItem('sre_agent_user_id', userId);
+            console.log('Generated new user ID:', userId);
+        } else {
+            console.log('Using existing user ID:', userId);
+        }
+        
+        return userId;
+    }
+
+    generateEnhancedFingerprint() {
+        // Create a more robust fingerprint
+        const screen = `${window.screen.width}x${window.screen.height}`;
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const language = navigator.language || navigator.userLanguage;
+        const platform = navigator.platform;
+        const userAgent = navigator.userAgent;
+        
+        // Combine multiple factors for better uniqueness
+        const fingerprint = `${screen}:${timezone}:${language}:${platform}:${userAgent}`;
+        
+        // Hash it to reasonable length
+        return this.simpleHash(fingerprint);
+    }
+
+    simpleHash(str) {
+        let hash = 0;
+        if (str.length === 0) return hash.toString();
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return Math.abs(hash).toString(16).substring(0, 16);
+    }
+
+    async loadChatHistory() {
+        if (!this.currentUserId) {
+            console.log('No user ID available for loading history');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/chat-history', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: this.currentUserId,
+                    limit: 10 // Load recent conversations
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                this.chatHistory = data.history || [];
+                this.updateChatHistoryIndicator();
+                
+                // Load recent conversations into chat (last 3)
+                if (this.chatHistory.length > 0) {
+                    this.loadRecentConversations();
+                }
+            } else {
+                console.log('No previous chat history found');
+            }
+        } catch (error) {
+            console.error('Error loading chat history:', error);
+        }
+    }
+
+    loadRecentConversations() {
+        // Load last 3 conversations
+        const recentConversations = this.chatHistory.slice(0, 3);
+        
+        if (recentConversations.length > 0) {
+            // Add separator
+            const separator = document.createElement('div');
+            separator.className = 'chat-separator';
+            separator.innerHTML = '<span>📋 Recent Conversations</span>';
+            this.chatMessages.appendChild(separator);
+            
+            // Load conversations in chronological order
+            recentConversations.reverse().forEach(conversation => {
+                this.addMessage(conversation.user_message, 'user');
+                this.addMessage(conversation.bot_response, 'bot');
+            });
+            
+            // Add current session separator
+            const currentSeparator = document.createElement('div');
+            currentSeparator.className = 'chat-separator current';
+            currentSeparator.innerHTML = '<span>💬 Current Session</span>';
+            this.chatMessages.appendChild(currentSeparator);
+        }
+    }
+
+    updateChatHistoryIndicator() {
+        const indicator = document.getElementById('chatHistoryIndicator');
+        if (indicator) {
+            if (this.chatHistory.length > 0) {
+                indicator.textContent = `${this.chatHistory.length} saved conversation${this.chatHistory.length > 1 ? 's' : ''}`;
+                indicator.style.display = 'block';
+            } else {
+                indicator.style.display = 'none';
+            }
+        }
+    }
+
+    async newChat() {
+        // Clear current chat but keep history
+        this.chatMessages.innerHTML = '';
+        this.chatInput.value = '';
+        
+        // Show welcome message
+        this.addMessage("Hello! I'm your AI SRE Engineer. I can remember our previous conversations for up to a week. How can I help you today?", 'bot');
+        
+        this.showToast('Started new chat session', 'success');
+    }
+
+    async deleteAllHistory() {
+        if (!this.currentUserId) {
+            this.showToast('No chat history to delete', 'warning');
+            return;
+        }
+
+        if (confirm('⚠️ Are you sure you want to delete ALL chat history?\n\nThis will:\n• Remove all saved conversations\n• Reset the AI\'s memory of previous chats\n• Cannot be undone\n\nContinue?')) {
+            try {
+                const response = await fetch('/api/chat-history', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: this.currentUserId
+                    })
+                });
+
+                if (response.ok) {
+                    this.chatHistory = [];
+                    this.updateChatHistoryIndicator();
+                    this.showToast('All chat history deleted successfully', 'success');
+                    
+                    // Close modal if open
+                    const modal = document.getElementById('chatHistoryModal');
+                    if (modal && modal.style.display === 'block') {
+                        modal.style.display = 'none';
+                    }
+                    
+                    // Clear current chat
+                    this.newChat();
+                } else {
+                    throw new Error('Failed to delete chat history');
+                }
+            } catch (error) {
+                console.error('Error deleting chat history:', error);
+                this.showToast('Failed to delete chat history', 'error');
+            }
+        }
     }
     
     sendMessage() {
@@ -280,191 +457,122 @@ class SREChatInterface {
         this.showToast('PDF generation initiated! Please check your downloads folder.');
     }
 
-    showToast(message, type = 'success') {
-        // Remove existing toast if any
-        const existingToast = document.querySelector('.toast');
-        if (existingToast) {
-            existingToast.remove();
+    async displayChatHistoryModal() {
+        if (!this.currentUserId) {
+            this.showToast('No chat history available', 'warning');
+            return;
         }
-        
-        // Create toast element
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.textContent = message;
-        
-        // Add toast styles if not already added
-        this.addToastStyles();
-        
-        // Add to body
-        document.body.appendChild(toast);
-        
-        // Show toast with animation
-        setTimeout(() => {
-            toast.classList.add('show');
-        }, 100);
-        
-        // Hide and remove toast after 3 seconds
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => {
-                toast.remove();
-            }, 300);
-        }, 3000);
-    }
 
-    addToastStyles() {
-        if (document.querySelector('.toast-styles')) return;
-        
-        const style = document.createElement('style');
-        style.className = 'toast-styles';
-        style.textContent = `
-            .toast {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background-color: #4caf50;
-                color: white;
-                padding: 12px 24px;
-                border-radius: 6px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                font-size: 14px;
-                font-weight: 500;
-                z-index: 10000;
-                opacity: 0;
-                transform: translateY(-20px);
-                transition: all 0.3s ease;
-                max-width: 300px;
-                word-wrap: break-word;
-            }
-            
-            .toast.show {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            
-            .toast-success {
-                background-color: #4caf50;
-            }
-            
-            .toast-error {
-                background-color: #f44336;
-            }
-            
-            .toast-warning {
-                background-color: #ff9800;
-            }
-            
-            .toast-info {
-                background-color: #2196f3;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
-    showTypingIndicator() {
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'message bot typing-indicator';
-        typingDiv.innerHTML = `
-            <div class="message-content">
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        `;
-        this.chatMessages.appendChild(typingDiv);
-        
-        // Smooth scroll to the typing indicator
-        setTimeout(() => {
-            typingDiv.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'nearest' 
-            });
-        }, 100);
-        
-        // Add CSS for typing animation
-        this.addTypingAnimation();
-    }
-    
-    hideTypingIndicator() {
-        const typingIndicator = this.chatMessages.querySelector('.typing-indicator');
-        if (typingIndicator) {
-            typingIndicator.remove();
-        }
-    }
-    
-    addTypingAnimation() {
-        if (document.querySelector('.typing-animation-styles')) return;
-        
-        const style = document.createElement('style');
-        style.className = 'typing-animation-styles';
-        style.textContent = `
-            .typing-dots {
-                display: flex;
-                gap: 4px;
-                align-items: center;
-            }
-            
-            .typing-dots span {
-                width: 6px;
-                height: 6px;
-                background-color: #999;
-                border-radius: 50%;
-                animation: typing 1.4s infinite ease-in-out;
-            }
-            
-            .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
-            .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
-            .typing-dots span:nth-child(3) { animation-delay: 0s; }
-            
-            @keyframes typing {
-                0%, 80%, 100% {
-                    transform: scale(0.8);
-                    opacity: 0.5;
-                }
-                40% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
-    async sendToAPI(message) {
         try {
-            const apiUrl = 'https://sre-agent-948325778469.northamerica-northeast2.run.app/api/chat'; // Replace with your actual API URL
-            const response = await fetch(apiUrl, {
+            const response = await fetch('/api/chat-history', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    message: message
+                    user_id: this.currentUserId,
+                    limit: 50
                 })
             });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+
+            if (response.ok) {
+                const data = await response.json();
+                const allHistory = data.history || [];
+                this.showHistoryModal(allHistory);
+            } else {
+                this.showToast('Failed to load chat history', 'error');
             }
-            
-            const data = await response.json();
-            this.hideTypingIndicator();
-            this.addMessage(data.response, 'bot');
-            
         } catch (error) {
-            console.error('Error sending message to API:', error);
-            this.hideTypingIndicator();
-            this.addMessage('Sorry, I encountered an error while processing your request. Please try again later.', 'bot');
+            console.error('Error fetching chat history:', error);
+            this.showToast('Failed to load chat history', 'error');
         }
     }
-    
-    autoResizeInput() {
-        // Auto-resize input field if needed (future enhancement)
-        this.chatInput.style.height = 'auto';
-        this.chatInput.style.height = this.chatInput.scrollHeight + 'px';
+
+    showHistoryModal(history) {
+        const modal = document.getElementById('chatHistoryModal');
+        if (!modal) {
+            this.createHistoryModal();
+            return this.showHistoryModal(history);
+        }
+        
+        const historyContent = document.getElementById('historyContent');
+        
+        if (history.length === 0) {
+            historyContent.innerHTML = '<p class="no-history">No chat history available</p>';
+        } else {
+            historyContent.innerHTML = history.map((conversation, index) => `
+                <div class="history-item">
+                    <div class="user-message">
+                        <strong>You:</strong> ${this.escapeHtml(conversation.user_message)}
+                    </div>
+                    <div class="bot-response-container">
+                        <button class="show-response-btn" onclick="window.sreChat.toggleResponse(${index})">
+                            Show Response
+                        </button>
+                        <div class="bot-response" id="response-${index}" style="display: none;">
+                            <strong>AI:</strong> ${this.convertMarkdownToHTML(conversation.bot_response)}
+                        </div>
+                    </div>
+                    <div class="timestamp">
+                        ${this.formatTimestamp(conversation.timestamp)}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        modal.style.display = 'block';
+    }
+
+    createHistoryModal() {
+        const modal = document.createElement('div');
+        modal.id = 'chatHistoryModal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Chat History (Last 7 Days)</h3>
+                    <span class="close" onclick="document.getElementById('chatHistoryModal').style.display='none'">&times;</span>
+                </div>
+                <div id="historyContent" class="modal-body">
+                    <!-- History content will be loaded here -->
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+
+    toggleResponse(index) {
+        const responseDiv = document.getElementById(`response-${index}`);
+        const button = responseDiv.parentElement.querySelector('.show-response-btn');
+        
+        if (responseDiv.style.display === 'none') {
+            responseDiv.style.display = 'block';
+            button.textContent = 'Hide Response';
+        } else {
+            responseDiv.style.display = 'none';
+            button.textContent = 'Show Response';
+        }
+    }
+
+    formatTimestamp(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diffInHours = (now - date) / (1000 * 60 * 60);
+        
+        if (diffInHours < 1) {
+            return 'Just now';
+        } else if (diffInHours < 24) {
+            return `${Math.floor(diffInHours)} hour${Math.floor(diffInHours) > 1 ? 's' : ''} ago`;
+        } else {
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
     }
 }
 
@@ -556,12 +664,17 @@ class SmoothScrolling {
 
 // Initialize all functionality when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new SREChatInterface();
+    window.sreChat = new SREChatInterface();
     new QuestionCardInteractions();
     new SmoothScrolling();
     
     // Add some visual enhancements
     addVisualEnhancements();
+    
+    // Add global functions for HTML onclick handlers
+    window.newChat = () => window.sreChat.newChat();
+    window.deleteAllHistory = () => window.sreChat.deleteAllHistory();
+    window.displayChatHistoryModal = () => window.sreChat.displayChatHistoryModal();
 });
 
 function addVisualEnhancements() {
