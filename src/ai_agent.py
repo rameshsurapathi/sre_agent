@@ -50,6 +50,9 @@ class AI_Agent:
                 expires = data.get("expires")
                 if expires and expires > datetime.now(timezone.utc):
                     print(f"Cache hit for user query")
+                    # Save to user's chat history even if from cache
+                    if user_id:
+                        self.save_chat_history(user_id, user_message, data.get("response"))
                     return data.get("response")
                 else:
                     # Delete expired cache

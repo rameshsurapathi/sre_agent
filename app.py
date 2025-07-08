@@ -41,7 +41,7 @@ class ChatRequest(BaseModel):
 
 class ChatHistoryRequest(BaseModel):
     user_id: str
-    limit: Optional[int] = 20
+    limit: Optional[int] = 10
 
 class DeleteHistoryRequest(BaseModel):
     user_id: str
