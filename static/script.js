@@ -24,10 +24,10 @@ class SREChatInterface {
             }
         });
         
-        // Auto-resize input
-        this.chatInput.addEventListener('input', () => {
-            this.autoResizeInput();
-        });
+        // Auto-resize input (removed unused autoResizeInput call)
+        // this.chatInput.addEventListener('input', () => {
+        //     this.autoResizeInput();
+        // });
     }
     
     sendMessage() {
@@ -40,8 +40,8 @@ class SREChatInterface {
         // Clear input
         this.chatInput.value = '';
         
-        // Show typing indicator
-        this.showTypingIndicator();
+        // Show typing indicator (removed unused showTypingIndicator call)
+        // this.showTypingIndicator();
         
         // Make API call to FastAPI backend
         this.sendToAPI(message);
@@ -399,6 +399,10 @@ class SREChatInterface {
         } else {
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         }
+    }
+    
+    initializeUserSession() {
+        // Placeholder for user session logic (can be expanded as needed)
     }
 }
 
