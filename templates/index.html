@@ -30,6 +30,24 @@
             </p>
         </header>
 
+        <!-- Chat Controls Section -->
+        <section class="chat-controls-section">
+            <div class="chat-controls">
+                <button id="newChatBtn" onclick="newChat()" class="control-btn">
+                    ✨ New Chat
+                </button>
+                <button id="viewHistoryBtn" onclick="displayChatHistoryModal()" class="control-btn">
+                    📋 View History
+                </button>
+                <button id="deleteHistoryBtn" onclick="deleteAllHistory()" class="control-btn danger">
+                    🗑️ Delete History
+                </button>
+            </div>
+            <div id="chatHistoryIndicator" class="chat-history-indicator" style="display: none;">
+                No conversations
+            </div>
+        </section>
+
         <!-- Popular Questions Section -->
         <section class="popular-questions">
             <h2>Popular SRE & Reliability Questions</h2>
@@ -84,7 +102,8 @@
                     </div>
                     <div class="chat-info">
                         <h3>Expert SRE Engineer</h3>
-                        <p>Hello! I'm your Expert Site Reliability Engineer. I specialize in monitoring, observability, incident response, system reliability, and SRE best practices. I can help you with SLI/SLO design, chaos engineering, Prometheus/Grafana, alerting strategies, capacity planning, and building resilient distributed systems. What reliability challenge are you working on today?</p>
+                        <p>Hello! With whom do I have the pleasure of speaking today? 🤖</p>
+                        <p>I'm your Expert Site Reliability Engineer. I specialize in monitoring, observability, incident response, system reliability, and SRE best practices. I can help you with SLI/SLO design, chaos engineering, Prometheus/Grafana, alerting strategies, capacity planning, and building resilient distributed systems. What reliability challenge are you working on today?</p>
                         <span class="timestamp">2:35:45 PM</span>
                     </div>
                 </div>
