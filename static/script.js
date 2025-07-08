@@ -1,5 +1,29 @@
 // Chat functionality
 class SREChatInterface {
+    async sendToAPI(message) {
+        // Sends the user message to the backend and handles the response
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    user_id: this.currentUserId
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                this.currentUserId = data.user_id;
+                this.addMessage(data.response, 'bot');
+            } else {
+                this.addMessage('Sorry, there was a problem getting a response from the AI.', 'bot');
+            }
+        } catch (error) {
+            this.addMessage('Network error. Please try again later.', 'bot');
+        }
+    }
     constructor() {
         this.chatInput = document.getElementById('chatInput');
         this.sendButton = document.getElementById('sendButton');
