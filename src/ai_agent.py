@@ -16,9 +16,10 @@ from datetime import datetime, timezone, timedelta
 import hashlib
 
 # setting up Firestore for caching and chat history
-from firebase_admin import firestore, initialize_app
+import boto3
+from botocore.client import Config
 initialize_app()
-db = firestore.client()
+s3 = boto3.client("s3", endpoint_url=os.getenv("R2_ENDPOINT"), aws_access_key_id=os.getenv("R2_ACCESS_KEY_ID"), aws_secret_access_key=os.getenv("R2_SECRET_ACCESS_KEY"), config=Config(signature_version="s3v4"), region_name="auto")
 
 class AgentState(TypedDict):
     messages: list
