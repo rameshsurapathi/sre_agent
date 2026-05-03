@@ -9,9 +9,7 @@ fastapi
 uvicorn[standard]
 jinja2
 boto3
-datetime
 
 # Additional dependencies
 pydantic
-langchain-google-genaiboto3
 langchain-google-genai
