@@ -124,16 +124,18 @@ class SREChatInterface {
                     user_id: this.currentUserId
                 })
             });
-            if (response.ok) {
-                const data = await response.json();
+                // Remove typing indicator
+                this.hideTypingIndicator();
                 this.currentUserId = data.user_id;
                 // Persist userId for future visits
                 localStorage.setItem('sre_user_id', this.currentUserId);
                 this.addMessage(data.response, 'bot');
             } else {
+                this.hideTypingIndicator();
                 this.addMessage('Sorry, there was a problem getting a response from the AI.', 'bot');
             }
         } catch (error) {
+            this.hideTypingIndicator();
             this.addMessage('Network error. Please try again later.', 'bot');
         }
     }
@@ -182,8 +184,8 @@ class SREChatInterface {
         // Clear input
         this.chatInput.value = '';
         
-        // Show typing indicator (removed unused showTypingIndicator call)
-        // this.showTypingIndicator();
+        // Show typing indicator
+        this.showTypingIndicator();
         
         // Make API call to FastAPI backend
         this.sendToAPI(message);
@@ -228,6 +230,30 @@ class SREChatInterface {
                 block: 'nearest' 
             });
         }, 100);
+    }
+
+    showTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot typing-indicator-container';
+        typingDiv.id = 'typingIndicator';
+        typingDiv.innerHTML = `
+            <div class="message-content">
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        `;
+        this.chatMessages.appendChild(typingDiv);
+        this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+    }
+
+    hideTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) {
+            indicator.remove();
+        }
     }
     
     convertMarkdownToHTML(markdown) {

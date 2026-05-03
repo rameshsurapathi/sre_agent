@@ -84,13 +84,6 @@ async def chat_endpoint(request: Request, chat: ChatRequest):
         agent = AI_Agent(api_key)
         response = agent.get_response(chat.message, user_id)
         
-        # Save to chat history
-        try:
-            agent.save_chat_history(user_id, chat.message, response)
-        except Exception as e:
-            print(f"Error saving chat history: {e}")
-            # Don't fail the request if history save fails
-        
         return JSONResponse({
             "response": response,
             "user_id": user_id
