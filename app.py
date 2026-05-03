@@ -59,7 +59,7 @@ def generate_enhanced_user_id(request: Request) -> str:
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="index.html")
 
 @app.post("/api/chat")
 async def chat_endpoint(request: Request, chat: ChatRequest):
