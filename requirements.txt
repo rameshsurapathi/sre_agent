@@ -13,4 +13,5 @@ datetime
 
 # Additional dependencies
 pydantic
+langchain-google-genaiboto3
 langchain-google-genai
