@@ -8,7 +8,7 @@ class SREChatInterface {
         // Show confirmation modal
         this.showConfirmationModal('Are you sure you want to delete all chat history?', async () => {
             try {
-                const apiUrl = 'https://sre-agent-948325778469.northamerica-northeast2.run.app/api/chat-history';
+                const apiUrl = '/api/chat-history';
                 const response = await fetch(apiUrl, {
                     method: 'DELETE',
                     headers: {
@@ -113,7 +113,7 @@ class SREChatInterface {
     async sendToAPI(message) {
         // Sends the user message to the backend and handles the response
         try {
-            const apiUrl = 'https://sre-agent-948325778469.northamerica-northeast2.run.app/api/chat';
+            const apiUrl = '/api/chat';
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
@@ -438,7 +438,7 @@ class SREChatInterface {
         const existing = document.getElementById('chatHistoryModal');
         if (existing) existing.remove();
         try {
-            const apiUrl = 'https://sre-agent-948325778469.northamerica-northeast2.run.app/api/chat-history';
+            const apiUrl = '/api/chat-history';
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
@@ -625,7 +625,7 @@ class SREChatInterface {
         // Load last 5 chat interactions for the user on page load
         if (!this.currentUserId) return;
         try {
-            const apiUrl = 'https://sre-agent-948325778469.northamerica-northeast2.run.app/api/chat-history';
+            const apiUrl = '/api/chat-history';
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
