@@ -124,6 +124,8 @@ class SREChatInterface {
                     user_id: this.currentUserId
                 })
             });
+            if (response.ok) {
+                const data = await response.json();
                 // Remove typing indicator
                 this.hideTypingIndicator();
                 this.currentUserId = data.user_id;
